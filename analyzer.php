@@ -10,7 +10,7 @@
 $starttime = microtime(true);
 
 //読み込み確認
-if(isset($_POST['body'])){
+if(!isset($_POST['body'])){
     return false;
 }
 
@@ -28,15 +28,19 @@ $rowcount['blank'] = 0;
 //処理
 foreach ($content as $row){
     //判定
-    if(preg_match("/^.+「.*」$/",$row) == 1){
-        $rowcount['serifu']++;
+    $row = str_replace(array("\r\n", "\r", "\n"),"",$row);
+    if(preg_match("/^.+「.*」/m",$row) === 1){
+        $rowcount['words']++;
         $script = explode("「",$row);
         if(isset($actorcount[$script[0]])){
-            $actorcount[$script[0]]++;
+            $actorcount[$script[0]]['times']++;
         }else{
-            $actorcount[$script[0]] = 1;
+            $actorcount[$script[0]] = array(
+                "actor" => $script[0],
+                "times" => 1
+            );
         }
-    }else if(preg_match("/^( |　).$/",$row) == 1){
+    }else if(preg_match("/^( |　).$/m",$row) == 1 || empty($row)){
         $rowcount['blank']++;
     }else{
         $rowcount['narration']++;
@@ -55,16 +59,20 @@ $processtime = microtime(true) - $starttime;
     <title>結果表示</title>
 </head>
 <body>
-<p>処理終了</p>
+<h2>解析結果</h2>
+<p>全体の行数</p>
 <table>
     <tr>
         <th>総行数</th><td><?php echo $rowcount['total']; ?></td>
     </tr>
     <tr>
-        <th>台詞行数</th><td><?php echo $rowcount['serifu']; ?></td>
+        <th>台詞行数</th><td><?php echo $rowcount['words']; ?></td>
     </tr>
     <tr>
-        <th>ナレ行数</th><td><?php echo $rowcount['blank']; ?></td>
+        <th>ナレ行数</th><td><?php echo $rowcount['narration']; ?></td>
+    </tr>
+    <tr>
+        <th>空行</th><td><?php echo $rowcount['blank']; ?></td>
     </tr>
 </table>
 <p>人物別カウント</p>
@@ -74,7 +82,7 @@ $processtime = microtime(true) - $starttime;
         foreach ($actorcount as $actor){
             ?>
             <tr>
-                <th><?php echo key($actor); ?></th><td><?php echo $actor ?></td>
+                <th><?php echo $actor['actor'] ?></th><td><?php echo $actor['times'] ?></td>
             </tr>
             <?php
         }
@@ -84,5 +92,11 @@ $processtime = microtime(true) - $starttime;
 <p>
     処理時間 : <?php echo $processtime; ?>
 </p>
+<h2>入力内容</h2>
+<div style="height: 500px;overflow-y: scroll">
+    <pre>
+<?php echo $_POST['body']; ?>
+    </pre>
+</div>
 </body>
 </html>
