@@ -5,14 +5,20 @@
  * Date: 17/05/22
  * Time: 20:45
  */
+session_start();
 
 //処理時間
 $starttime = microtime(true);
 
 //読み込み確認
-if(!isset($_POST['body'])){
-    return false;
+if(!isset($_POST['body']) || empty($_POST['body'])){
+    $error = "入力がありません";
+    $message = "入力を確かめて再実行してください";
 }
+
+//バイト数・文字列
+$byte = strlen($_POST['body']);
+$char = mb_strlen($_POST['body']);
 
 //行ごとの配列化
 $content = explode("\n",$_POST['body']);
@@ -48,7 +54,7 @@ foreach ($content as $row){
 }
 
 //処理終了時間
-$processtime = microtime(true) - $starttime;
+$processtime = round(microtime(true) - $starttime,4);
 
 //結果表示
 ?>
@@ -57,46 +63,92 @@ $processtime = microtime(true) - $starttime;
 <head>
     <meta charset="UTF-8">
     <title>結果表示</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/earlyaccess/mplus1p.css">
+    <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
-<h2>解析結果</h2>
-<p>全体の行数</p>
-<table>
-    <tr>
-        <th>総行数</th><td><?php echo $rowcount['total']; ?></td>
-    </tr>
-    <tr>
-        <th>台詞行数</th><td><?php echo $rowcount['words']; ?></td>
-    </tr>
-    <tr>
-        <th>ナレ行数</th><td><?php echo $rowcount['narration']; ?></td>
-    </tr>
-    <tr>
-        <th>空行</th><td><?php echo $rowcount['blank']; ?></td>
-    </tr>
-</table>
-<p>人物別カウント</p>
-<table>
-    <?php
-    if(isset($actorcount)){
-        foreach ($actorcount as $actor){
-            ?>
-            <tr>
-                <th><?php echo $actor['actor'] ?></th><td><?php echo $actor['times'] ?></td>
-            </tr>
-            <?php
-        }
-    }
+<?php
+if(isset($error)){
     ?>
-</table>
-<p>
-    処理時間 : <?php echo $processtime; ?>
-</p>
-<h2>入力内容</h2>
-<div style="height: 500px;overflow-y: scroll">
-    <pre>
+    <div id="message" class="error">
+        <i><?php echo htmlspecialchars($error); ?></i><br>
+        <?php if(isset($message))echo htmlspecialchars($message); ?>
+    </div>
+<?php
+}
+?>
+<div id="header">
+    <div class="sitename">SSAnalyzer<span style="font-size: 15px"> - Short Story Analyzer</span></div>
+    <div class="headmenu">
+        <ul>
+            <li><a href="index.php">TOP</a></li>
+        </ul>
+    </div>
+</div>
+<div id="content">
+    <h1>解析結果</h1>
+    <div class="msgbox">
+        <div class="msgboxtop">統計</div>
+        <div class="msgboxbody">
+            <div>
+                <div style="float: left;width: 400px">
+                    <h3 style="margin-top: 0;">全体の行数</h3>
+                    <table>
+                        <tr>
+                            <th>総行数</th><td><?php echo $rowcount['total']; ?></td>
+                        </tr>
+                        <tr>
+                            <th>台詞行数</th><td><?php echo $rowcount['words']; ?></td>
+                        </tr>
+                        <tr>
+                            <th>ナレ行数</th><td><?php echo $rowcount['narration']; ?></td>
+                        </tr>
+                        <tr>
+                            <th>空行</th><td><?php echo $rowcount['blank']; ?></td>
+                        </tr>
+                    </table>
+                    <h3>文書情報</h3>
+                    <table>
+                        <tr>
+                            <th>バイト数</th><td><?php echo $byte."bytes"; ?></td>
+                        </tr>
+                        <tr>
+                            <th>文字数カウント</th><td><?php echo $char; ?></td>
+                        </tr>
+                    </table>
+                </div>
+                <div style="margin-left: 410px;width: auto;">
+                    <h3>人物別カウント</h3>
+                    <table>
+                        <?php
+                        if(isset($actorcount)){
+                            foreach ($actorcount as $actor){
+                                ?>
+                                <tr>
+                                    <th><?php echo htmlspecialchars($actor['actor']); ?></th><td><?php echo $actor['times'] ?></td>
+                                </tr>
+                                <?php
+                            }
+                        }
+                        ?>
+                    </table>
+                </div>
+                <p>
+                    処理時間 : <?php echo $processtime."sec"; ?>
+                </p>
+            </div>
+        </div>
+        <div class="msgboxfoot"></div>
+    </div>
+    <div class="msgbox">
+        <div class="msgboxtop">入力内容</div>
+        <div class="msgboxbody" style="height: 500px;overflow-y: scroll">
+            <pre>
 <?php echo $_POST['body']; ?>
-    </pre>
+            </pre>
+        </div>
+        <div class="msgboxfoot"></div>
+    </div>
 </div>
 </body>
 </html>
