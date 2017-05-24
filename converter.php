@@ -34,7 +34,7 @@ if(!$defines){
 }else{
     foreach ($actors as $a){
         if(!empty($_POST['actor_'.$a])){
-            $defined[$a] = htmlspecialchars($_POST['actor'.$a]);
+            $defined[$a] = htmlspecialchars($_POST['actor_'.$a]);
         }
     }
 }
@@ -61,7 +61,7 @@ if(isset($content)){
             if(isset($defined[$script[0]])){
 //                $script[1] = mb_substr($script[1],0,-1,"UTF-8");
                 $script[1] = str_replace("」","",$script[1]);
-                $code = BuildShortcode($script[0],$defined[$script[0]]);
+                $code = BuildShortcode($script[0],$defines[$defined[$script[0]]]);
                 $code .= $script[1];
                 $code .= "[/speech_bubble]";
                 $converted[] = $code;
