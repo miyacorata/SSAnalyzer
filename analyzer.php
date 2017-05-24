@@ -159,6 +159,14 @@ if(isset($error)){
     require_once __DIR__."/settings/loaddifinition.php";
     if(isset($actorcount) && CheckEnable()){
         $list_n = LoadDifinition(true);
+        $check = md5($body);
+        $_SESSION['check'] = $check;
+        $actorstr = "";
+        unset($actor);
+        foreach ($actorcount as $actor){
+            $actorstr .= $actor['actor'].",";
+        }
+        $actorstr = mb_substr($actorstr,0,-1,"UTF-8");
         ?>
         <form method="post" action="converter.php" name="convert">
             <div class="msgbox">
@@ -201,6 +209,8 @@ if(isset($error)){
                     </div>
                     <h3>SS本文<span style="font-size: 14px;font-style: italic;color: lightgray;"> 変更できません</span></h3>
                     <textarea name="body" title="SS本文" readonly><?php if(isset($body))echo $body; ?></textarea>
+                    <input type="hidden" name="actor" value="<?php echo $actorstr ?>">
+                    <input type="hidden" name="check" value="<?php echo $check ?>">
                 </div>
                 <div class="msgboxfoot">
                     <a href="javascript:void(0)" onclick="document.convert.submit();" class="button">変換実行</a>
