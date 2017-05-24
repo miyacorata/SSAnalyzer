@@ -5,23 +5,28 @@
  * Date: 17/05/22
  * Time: 20:45
  */
+ini_set("error_reporting",1);
+
 session_start();
 
 //処理時間
 $starttime = microtime(true);
 
 //読み込み確認
-if(!isset($_POST['body']) || empty($_POST['body'])){
-    $error = "入力がありません";
-    $message = "入力を確かめて再実行してください";
+if(isset($_POST['body']) && !empty($_POST['body'])){
+    $body = htmlspecialchars($_POST['body']);
+    //バイト数・文字列
+    $byte = strlen($body);
+    $char = mb_strlen($body);
+}else {
+    $_SESSION['error'] = "入力がありません";
+    $_SESSION['message'] = "入力を確かめて再実行してください";
+    header("Location: ./index.php");
+    exit();
 }
 
-//バイト数・文字列
-$byte = strlen($_POST['body']);
-$char = mb_strlen($_POST['body']);
-
 //行ごとの配列化
-$content = explode("\n",$_POST['body']);
+$content = explode("\n",$body);
 
 //行数
 $rowcount['total'] = count($content);
@@ -65,6 +70,16 @@ $processtime = round(microtime(true) - $starttime,4);
     <title>結果表示</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/earlyaccess/mplus1p.css">
     <link rel="stylesheet" href="./css/style.css">
+    <style type="text/css">
+        textarea {
+            height: 350px;
+            width: 100%;
+            resize: vertical;
+        }
+        a{
+            color: whitesmoke;
+        }
+    </style>
 </head>
 <body>
 <?php
@@ -117,7 +132,7 @@ if(isset($error)){
                         </tr>
                     </table>
                 </div>
-                <div style="margin-left: 410px;width: auto;">
+                <div style="margin-left: 410px;width: auto;min-height: 250px">
                     <h3>人物別カウント</h3>
                     <table>
                         <?php
@@ -140,15 +155,73 @@ if(isset($error)){
         </div>
         <div class="msgboxfoot"></div>
     </div>
-    <div class="msgbox">
-        <div class="msgboxtop">入力内容</div>
-        <div class="msgboxbody" style="height: 500px;overflow-y: scroll">
-            <pre>
-<?php echo $_POST['body']; ?>
-            </pre>
+    <?php
+    require_once __DIR__."/settings/loaddifinition.php";
+    if(isset($actorcount) && CheckEnable()){
+        $list_n = LoadDifinition(true);
+        ?>
+        <form method="post" action="converter.php" name="convert">
+            <div class="msgbox">
+                <div class="msgboxtop">ショートコード生成</div>
+                <div class="msgboxbody">
+                    <p>
+                        ショートコード生成が利用可能です<br>
+                        それぞれの登場人物に使うアイコンを選択してください。
+                    </p>
+                    <h3>アイコン選択</h3>
+                    <div style="max-height: 300px;overflow-y: scroll">
+                        <table>
+                        <?php
+                        unset($actor);
+                        if(isset($actorcount)){
+                            foreach ($actorcount as $actor){
+                            ?>
+                                <tr>
+                                    <th><?php echo htmlspecialchars($actor['actor']); ?></th>
+                                    <td>
+                                        <select name="actor_<?php echo htmlspecialchars($actor['actor']); ?>" title="選択" class="select">
+                                            <option value="">生成しない</option>
+                                            <?php
+                                            if(isset($list_n) && is_array($list_n)){
+                                                foreach ($list_n as $n){
+                                                    $n = htmlspecialchars($n);
+                                                    ?>
+                                                    <option value="<?php echo $n; ?>"><?php echo $n; ?></option>
+                                                    <?php
+                                                }
+                                            } ?>
+                                        </select>
+                                    </td>
+                                </tr>
+                            <?php
+                            }
+                        }
+                        ?>
+                        </table>
+                    </div>
+                    <h3>SS本文<span style="font-size: 14px;font-style: italic;color: lightgray;"> 変更できません</span></h3>
+                    <textarea name="body" title="SS本文" readonly><?php if(isset($body))echo $body; ?></textarea>
+                </div>
+                <div class="msgboxfoot">
+                    <a href="javascript:void(0)" onclick="document.convert.submit();" class="button">変換実行</a>
+                </div>
+            </div>
+        </form>
+        <?php
+    }else{
+        ?>
+        <div class="msgbox">
+            <div class="msgboxtop">ショートコード生成</div>
+            <div class="msgboxbody">
+                <p>
+                    ショートコード生成は現在利用できません。
+                </p>
+            </div>
+            <div class="msgboxfoot"></div>
         </div>
-        <div class="msgboxfoot"></div>
-    </div>
+        <?php
+    }
+    ?>
 </div>
 </body>
 </html>

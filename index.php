@@ -23,6 +23,18 @@ session_start();
     </style>
 </head>
 <body>
+<?php
+if(isset($_SESSION['error'])){
+    ?>
+    <div id="message" class="error">
+        <i><?php echo htmlspecialchars($_SESSION['error']); ?></i><br>
+        <?php if(isset($_SESSION['message']))echo htmlspecialchars($_SESSION['message']); ?>
+    </div>
+    <?php
+    unset($_SESSION['error']);
+    unset($_SESSION['message']);
+}
+?>
 <div id="header">
     <div class="sitename">SSAnalyzer<span style="font-size: 15px"> - Short Story Analyzer</span></div>
     <div class="headmenu">
