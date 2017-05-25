@@ -19,8 +19,8 @@ if(!isset($_SESSION['check']) && !isset($_POST['body']) && !isset($_POST['check'
     header("Location: ./index.php");
     exit();
 }else{
-    $content = explode("\n",htmlspecialchars($_POST['body']));
-    $actors = explode(",",htmlspecialchars($_POST['actor']));
+    $content = explode("\n",(string)$_POST['body']);
+    $actors = explode(",",(string)$_POST['actor']);
 }
 
 require_once __DIR__."/settings/loaddifinition.php";
@@ -34,7 +34,7 @@ if(!$defines){
 }else{
     foreach ($actors as $a){
         if(!empty($_POST['actor_'.$a])){
-            $defined[$a] = htmlspecialchars($_POST['actor_'.$a]);
+            $defined[$a] = (string)$_POST['actor_'.$a];
         }
     }
 }
@@ -62,7 +62,7 @@ if(isset($content)){
 //                $script[1] = mb_substr($script[1],0,-1,"UTF-8");
                 $script[1] = str_replace("」","",$script[1]);
                 $code = BuildShortcode($script[0],$defines[$defined[$script[0]]]);
-                $code .= $script[1];
+                $code .= htmlspecialchars($script[1],ENT_QUOTES);
                 $code .= "[/speech_bubble]";
                 $converted[] = $code;
             }else{

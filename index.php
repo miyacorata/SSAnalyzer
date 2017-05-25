@@ -27,8 +27,8 @@ session_start();
 if(isset($_SESSION['error'])){
     ?>
     <div id="message" class="error">
-        <i><?php echo htmlspecialchars($_SESSION['error']); ?></i><br>
-        <?php if(isset($_SESSION['message']))echo htmlspecialchars($_SESSION['message']); ?>
+        <i><?php echo htmlspecialchars($_SESSION['error'],ENT_QUOTES); ?></i><br>
+        <?php if(isset($_SESSION['message']))echo htmlspecialchars($_SESSION['message'],ENT_QUOTES); ?>
     </div>
     <?php
     unset($_SESSION['error']);

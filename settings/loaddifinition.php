@@ -57,5 +57,5 @@ function LoadDifinition($name = false){
  */
 function CheckEnable(){
     global $enable_sc;
-    return $enable_sc ? true : false;
+    return $enable_sc;
 }

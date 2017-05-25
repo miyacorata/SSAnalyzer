@@ -14,7 +14,7 @@ $starttime = microtime(true);
 
 //読み込み確認
 if(isset($_POST['body']) && !empty($_POST['body'])){
-    $body = htmlspecialchars($_POST['body']);
+    $body = (string)$_POST['body'];
     //バイト数・文字列
     $byte = strlen($body);
     $char = mb_strlen($body);
@@ -86,8 +86,8 @@ $processtime = round(microtime(true) - $starttime,4);
 if(isset($error)){
     ?>
     <div id="message" class="error">
-        <i><?php echo htmlspecialchars($error); ?></i><br>
-        <?php if(isset($message))echo htmlspecialchars($message); ?>
+        <i><?php echo htmlspecialchars($error,ENT_QUOTES); ?></i><br>
+        <?php if(isset($message))echo htmlspecialchars($message,ENT_QUOTES); ?>
     </div>
 <?php
 }
@@ -140,7 +140,7 @@ if(isset($error)){
                             foreach ($actorcount as $actor){
                                 ?>
                                 <tr>
-                                    <th><?php echo htmlspecialchars($actor['actor']); ?></th><td><?php echo $actor['times'] ?></td>
+                                    <th><?php echo htmlspecialchars($actor['actor'],ENT_QUOTES); ?></th><td><?php echo $actor['times'] ?></td>
                                 </tr>
                                 <?php
                             }
@@ -185,14 +185,14 @@ if(isset($error)){
                             foreach ($actorcount as $actor){
                             ?>
                                 <tr>
-                                    <th><?php echo htmlspecialchars($actor['actor']); ?></th>
+                                    <th><?php echo htmlspecialchars($actor['actor'],ENT_QUOTES); ?></th>
                                     <td>
-                                        <select name="actor_<?php echo htmlspecialchars($actor['actor']); ?>" title="選択" class="select">
+                                        <select name="actor_<?php echo htmlspecialchars($actor['actor'],ENT_QUOTES); ?>" title="選択" class="select">
                                             <option value="">生成しない</option>
                                             <?php
                                             if(isset($list_n) && is_array($list_n)){
                                                 foreach ($list_n as $n){
-                                                    $n = htmlspecialchars($n);
+                                                    $n = htmlspecialchars($n,ENT_QUOTES);
                                                     ?>
                                                     <option value="<?php echo $n; ?>"><?php echo $n; ?></option>
                                                     <?php
